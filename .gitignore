@@ -1,0 +1,15 @@
+# Build output
+build/
+
+# MSVC artifacts that land outside build/
+*.pdb
+*.ilk
+
+# VS/Editor
+.vs/
+*.user
+.vscode/
+
+# OS
+Thumbs.db
+desktop.ini
