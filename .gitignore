@@ -13,3 +13,13 @@ build/
 # OS
 Thumbs.db
 desktop.ini
+
+# SDL Build artifacts
+*.o
+*.obj
+*.so
+*.dll
+*.dylib
+
+#Vendor 
+vendor/
