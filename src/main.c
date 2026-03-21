@@ -1,33 +1,60 @@
 #include <stdio.h>
 #include <SDL3/SDL.h>
 
-int main(void) {
-    // Initialize SDL
+SDL_Window* window = NULL;
+SDL_Renderer* renderer = NULL;
+bool isRunning = true;
+
+void cleanup() {
+    if (renderer) {
+        SDL_DestroyRenderer(renderer);
+    }
+    if (window) {
+        SDL_DestroyWindow(window);
+    }
+    SDL_Quit();
+}   
+
+bool initialize_window(){
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         fprintf(stderr, "Failed to initialize SDL: %s\n", SDL_GetError());
-        return 1;
+        exit(1);
     }
 
-    SDL_Window* window = SDL_CreateWindow("3d Renderer", 800, 600, 0);
+    window = SDL_CreateWindow("3d Renderer", 800, 600, 0);
 
     if (!window) {
         fprintf(stderr, "Failed to create window: %s\n", SDL_GetError());
-        SDL_Quit();
-        return 1;
+        cleanup();
+        exit(1);
     }
 
+    // Create a renderer for the window
+    renderer = SDL_CreateRenderer(window, NULL);
+    if (!renderer) {
+        fprintf(stderr, "Failed to create renderer: %s\n", SDL_GetError());
+        cleanup();
+        exit(1);
+    }
+
+    return true;
+}
+
+int main(void) {
+    if (!initialize_window()) {
+        return 1;
+    }
+    
     SDL_Event event;
-    int running = 1; 
-    while(running){
+    while(isRunning){
         while(SDL_PollEvent(&event)){
             if(event.type == SDL_EVENT_QUIT){
-                running = 0;
+                isRunning = false;
             }
         }
     }
 
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    cleanup();
 
     return 0;
 }
