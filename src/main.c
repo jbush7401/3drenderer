@@ -1,4 +1,14 @@
 #include "display.h"
+#include "vector.h"
+
+
+/// @brief Declare an array of vectors/points representing a 9x9x9 cube
+/// @note The cube consists of 9 points along each axis, for a total of 9*9*9 points
+/// @note Each point in the cube is represented as a vec3_t struct containing x, y, z coordinates
+
+
+const int N_POINTS = 9*9*9;
+vec3_t cube_points[N_POINTS]; // 9x9x9 points for a cube
 
 bool isRunning = true;
 
@@ -52,6 +62,9 @@ int main(void) {
     if (!setup()) {
         return 1;
     }
+
+    vec3_t myvector = {1.0f, 2.0f, 3.0f};
+    
     while(isRunning){
         process_input();
         update();

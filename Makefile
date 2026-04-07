@@ -1,5 +1,5 @@
-CC = cl.exe
-CFLAGS = /std:c11 /W3 /WX /Zi /I$(SDL_INCLUDE)
+CXX = cl.exe
+CXXFLAGS = /std:c++20 /TP /EHsc /W3 /WX /Zi /I$(SDL_INCLUDE)
 BUILD_DIR = build
 SDL_DIR = vendor/sdl3
 SDL_INCLUDE = $(SDL_DIR)/include
@@ -14,18 +14,21 @@ EXE = $(BUILD_DIR)/renderer.exe
 
 all: $(EXE)
 
+$(BUILD_DIR):
+	if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+
 $(BUILD_DIR)/SDL3.dll: $(SDL_DLL)
 	if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
 	copy vendor\sdl3\SDL3.dll $(BUILD_DIR)\SDL3.dll
 
-$(BUILD_DIR)/main.obj: src/main.c src/display.h
-	$(CC) $(CFLAGS) /c /Fo:$(BUILD_DIR)/main.obj src/main.c
+$(BUILD_DIR)/main.obj: src/main.c src/display.h | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) /c /Fo:$(BUILD_DIR)/main.obj src/main.c
 
-$(BUILD_DIR)/display.obj: src/display.c src/display.h
-	$(CC) $(CFLAGS) /c /Fo:$(BUILD_DIR)/display.obj src/display.c
+$(BUILD_DIR)/display.obj: src/display.c src/display.h | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) /c /Fo:$(BUILD_DIR)/display.obj src/display.c
 
 $(EXE): $(OBJ) $(BUILD_DIR)/SDL3.dll
-	$(CC) $(CFLAGS) /Fd:$(BUILD_DIR)/ /Fe:$(EXE) $(OBJ) /link $(SDL_LIB)
+	$(CXX) /Fd:$(BUILD_DIR)/ /Fe:$(EXE) $(OBJ) /link $(SDL_LIB)
 
 
 run: $(EXE)
