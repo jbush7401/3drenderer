@@ -75,7 +75,8 @@ void draw_rect(int x, int y, int width, int height, uint32_t color) {
     for (int i = y; i < height+y; i++) {
         for (int j = x; j < width+x; j++) {
             if (j >= 0 && j < w_width && i >= 0 && i < w_height) {
-                color_buffer[i * w_width + j] = color;
+                draw_pixel(j, i, color);
+                //color_buffer[i * w_width + j] = color;
             }
         }
     }

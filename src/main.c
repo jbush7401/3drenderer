@@ -9,6 +9,9 @@
 
 const int N_POINTS = 9*9*9;
 vec3_t cube_points[N_POINTS]; // 9x9x9 points for a cube
+vec2_t projected_points[N_POINTS]; // 9x9x9 projected points for a cube
+
+float fov_factor = 128.0f;
 
 bool isRunning = true;
 
@@ -22,6 +25,20 @@ bool setup() {
     color_buffer = (uint32_t*)malloc(w_width * w_height * sizeof(uint32_t));
 
     color_buffer_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, w_width, w_height);
+
+    // Load a 9x9x9 grid of points from -1.0 to 1.0 in 0.25 steps.
+    // Integer indices avoid float comparison/casting edge cases.
+    for (int xi = 0; xi < 9; xi++) {
+        for (int yi = 0; yi < 9; yi++) {
+            for (int zi = 0; zi < 9; zi++) {
+                int index = xi * 81 + yi * 9 + zi;
+                cube_points[index].x = -1.0f + (float)xi * 0.25f;
+                cube_points[index].y = -1.0f + (float)yi * 0.25f;
+                cube_points[index].z = -1.0f + (float)zi * 0.25f;
+            }
+        }
+    }
+
     return true;
 }
 
@@ -40,18 +57,41 @@ void process_input() {
     }
 }
 
-void update(){
+/// @brief Function that received a 3d vector and returns a projected 2d point
+/// @param point 
+/// @return 
+vec2_t project(vec3_t point) {
+    vec2_t projected = {
+        .x = point.x * fov_factor,
+        .y = point.y * fov_factor
+    };
+    return projected;       
+}
 
+void update(){
+    for (int i = 0; i < N_POINTS; i++) {
+       vec3_t point = cube_points[i];
+
+       // Project the current point
+       vec2_t projected_point = project(point);
+
+       // Save the projected point in the projected_points array
+       projected_points[i] = projected_point;
+
+    }
 }
 
 void render() {
- // set render draw color
-    SDL_SetRenderDrawColor(renderer, 10, 0, 0, 255);
-    // clear the screen
-    SDL_RenderClear(renderer);
+   
     draw_grid(50);
-    draw_pixel(400, 303, 0XFF00FF00);
-    draw_rect(100, 200, 200, 150, 0XFFFF0000);
+     // draw the projected points
+    for (int i = 0; i < N_POINTS; i++) {
+        vec2_t point = projected_points[i];
+        draw_rect(
+            (int)point.x + w_width / 2, 
+            (int)point.y + w_height / 2, 
+        4, 4, 0XFFFFFF00);
+    }
     render_color_buffer();
     clear_color_buffer(0XFF333333);
     // present the backbuffer
